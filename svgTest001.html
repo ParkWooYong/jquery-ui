@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    svg {
+        background: tan;
+    }
+    #pan line {
+        stroke: dimgray;
+        stroke-width: 1;
+    }
+    #pan circle {
+        fill: dimgray;
+    }
+</style>
+<body>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min.js"></script>
+<script type="text/javascript">
+    var svg = d3.select("body").append("svg");
+    var width = 700;
+    var height = 700;
+    var showSeq = true;
+
+    svg.attr("width", width)
+            .attr("height", height)
+            .attr("onclick", "addData(event)");
+    svg.append("g")
+            .attr("id", "pan");
+    svg.append("g")
+            .attr("id", "gibo");
+
+    var dx = width / 20;
+    var dy = height / 20;
+
+    var svg = d3.select("svg");
+    var pan = d3.select("#pan");
+    var lineDatas = new Array();
+    var minX = dx;
+    var maxX = (dx * 19);
+    var minY = dy;
+    var maxY = (dy * 19);
+    for(var i = 1; i < 20; i++) {
+        var tx = (dx * i);
+        var ty = (dy * i);
+        lineDatas.push({'x1': minX, 'y1': ty, 'x2': maxX, 'y2': ty});
+        lineDatas.push({'x1': tx, 'y1': minY, 'x2': tx, 'y2': maxY});
+    }
+    pan.selectAll('line')
+            .data(lineDatas)
+            .enter()
+            .append('line')
+            .attr('x1', function(d) {return d.x1})
+            .attr('y1', function(d) {return d.y1})
+            .attr('x2', function(d) {return d.x2})
+            .attr('y2', function(d) {return d.y2});
+    var dotDatas = new Array();
+    dotDatas.push({x: dx * 4, y: dy * 4});
+    dotDatas.push({x: dx * 10, y: dy * 4});
+    dotDatas.push({x: dx * 16, y: dy * 4});
+    dotDatas.push({x: dx * 4, y: dy * 10});
+    dotDatas.push({x: dx * 10, y: dy * 10});
+    dotDatas.push({x: dx * 16, y: dy * 10});
+    dotDatas.push({x: dx * 4, y: dy * 16});
+    dotDatas.push({x: dx * 10, y: dy * 16});
+    dotDatas.push({x: dx * 16, y: dy * 16});
+    pan.attr("onmouseover", "mouseOver(this)");
+    pan.selectAll('circle')
+            .data(dotDatas)
+            .enter()
+            .append('circle')
+            .attr("cx", function(d) {return d.x})
+            .attr("cy", function(d) {return d.y})
+            .attr("r", Math.min(dx, dy) / 15);
+
+    var giboDatas = new Array();
+    for(var i = 0; i < (19 * 19); i ++) {
+        //var newData = {x: parseInt(Math.random() * 18) + 1, y: parseInt(Math.random() * 18) + 1};
+        //giboDatas.push(newData);
+    }
+    var gibo = d3.select("#gibo");
+    var gg = gibo.selectAll('g')
+            .data(giboDatas)
+            .enter()
+            .append('g')
+            .attr("transform", function (d) {return "translate(" + ((d.x * dx) - (dx / 2)) + ", " + ((d.y * dy) - (dy / 2)) + ")"})
+            .attr("onclick", "removeCircle(this)");
+    gg.append("rect")
+            .attr("x", 0)
+            .attr("Y", 0)
+            .attr("width", dx)
+            .attr("height", dy)
+            .style("opacity", 0);
+    gg.append('circle')
+            .attr("cx", dx / 2)
+            .attr("cy", dy / 2)
+            .attr("r", Math.min(dx, dy) / 2 - 2)
+            .style("fill", function(d, seq) {return seq % 2 == 0 ? 'black' : 'white'});
+    var seq = 0;
+    function addData(event) {
+        var x = Math.round(event.clientX / dx);
+        var y = Math.round(event.clientY / dy);
+        if (x < 1 || x > 19 || y < 1 || y > 19) return;
+        var g = gibo.append("g");
+
+        g.attr("transform", "translate(" + ((x * dx) - (dx / 2)) + ", " + ((y * dy) - (dy / 2)) + ")")
+                .attr("onclick", "removeCircle(this)");
+        g.append("rect")
+                .attr("x", 0)
+                .attr("Y", 0)
+                .attr("width", dx)
+                .attr("height", dy)
+                .style("opacity", 0);
+        g.append('circle')
+                .attr("cx", dx / 2)
+                .attr("cy", dy / 2)
+                .attr("r", Math.min(dx, dy) / 2 - 2)
+                .style("fill", seq % 2 == 0 ? 'black' : 'white');
+        if (showSeq) {
+            g.append('text')
+                    .text(seq + 1)
+                    .attr("dx", dx / 2)
+                    .attr("dy", dy / 2 + 3)
+                    .attr("text-anchor", "middle")
+                    .style({"fill": seq % 2 == 0 ? 'white' : 'black', "font-size": "10px"});
+        }
+        seq ++;
+    }
+    function mouseOver(e) {
+        return false;
+        var x = Math.round(event.clientX / dx);
+        var y = Math.round(event.clientY / dy);
+        if (x < 1 || x > 19 || y < 1 || y > 19) return;
+        var g = gibo.append("g");
+        g.attr("transform", "translate(" + ((x * dx) - (dx / 2)) + ", " + ((y * dy) - (dy / 2)) + ")")
+                .attr("onclick", "removeCircle(this)");
+        g.append("rect")
+                .attr("x", 0)
+                .attr("Y", 0)
+                .attr("width", dx)
+                .attr("height", dy)
+                .style("opacity", 0);
+        g.append('circle')
+                .attr("cx", dx / 2)
+                .attr("cy", dy / 2)
+                .attr("r", Math.min(dx, dy) / 2 - 2)
+                .style("fill", seq % 2 == 0 ? 'black' : 'white');
+    }
+    function removeCircle(e) {
+        d3.select(e).remove();
+        //d3.select(e.parentNode).remove();
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    function removeAllCircle() {
+        seq = 0;
+        gibo.selectAll("g").remove();
+    }
+    function zoom() {
+        gibo.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+</script>
+
+</body>
+</html>
