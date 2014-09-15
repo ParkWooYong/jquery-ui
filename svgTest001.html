@@ -2,8 +2,8 @@
 <html>
 <style>
     body {
-        margin: 0;
-        padding: 0;
+        margin: 10;
+        padding: 10;
     }
     svg {
         background: tan;
@@ -159,7 +159,6 @@
         gibo.selectAll("g").remove();
     }
     function zoom() {
-        //h
         gibo.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 </script>
